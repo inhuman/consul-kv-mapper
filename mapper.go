@@ -1,17 +1,16 @@
 package consul_kv_mapper
 
 import (
-	"fmt"
 	"github.com/hashicorp/consul/api"
 	"strings"
 )
 
-func BuildMap(client *api.Client, prefix string) interface{} {
+func BuildMap(client *api.Client, prefix string) (interface{}, error) {
 	var kvMap interface{}
 
 	kvPairs, _, err := client.KV().List(prefix, nil)
 	if err != nil {
-		fmt.Printf("fetch clusters from kv error: %s\n", err)
+		return nil, err
 	}
 
 	if len(kvPairs) != 0 {
@@ -48,7 +47,7 @@ func BuildMap(client *api.Client, prefix string) interface{} {
 
 	}
 
-	return kvMap
+	return kvMap, nil
 }
 
 func addNextLevel(n *Node, k KeyType, v ValueType, p ...KeyType) {
