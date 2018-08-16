@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-func BuildMap(client *api.Client, prefix string) (interface{}, error) {
-	kvMap := &Node{Value: "root"}
+func BuildMap(client *api.Client, prefix string) (*MapType, error) {
+	kvMap := &MapType{Value: "root"}
 
 	kvPairs, _, err := client.KV().List(prefix, nil)
 	if err != nil {
@@ -48,7 +48,7 @@ func BuildMap(client *api.Client, prefix string) (interface{}, error) {
 	return kvMap, nil
 }
 
-func addNextLevel(n *Node, k KeyType, v ValueType, p ...KeyType) {
+func addNextLevel(n *MapType, k KeyType, v ValueType, p ...KeyType) {
 
 	if len(p) > 0 {
 		n.Get(p...).Add(k, v)
@@ -60,26 +60,26 @@ func addNextLevel(n *Node, k KeyType, v ValueType, p ...KeyType) {
 type KeyType string
 type ValueType string
 
-type Node struct {
-	Children map[KeyType]*Node
+type MapType struct {
+	Children map[KeyType]*MapType
 	Value    ValueType
 }
 
-func (n *Node) Add(key KeyType, v ValueType) {
+func (n *MapType) Add(key KeyType, v ValueType) {
 	if n.Children == nil {
-		n.Children = map[KeyType]*Node{}
+		n.Children = map[KeyType]*MapType{}
 	}
-	n.Children[key] = &Node{Value: v}
+	n.Children[key] = &MapType{Value: v}
 }
 
-func (n *Node) Get(keys ...KeyType) *Node {
+func (n *MapType) Get(keys ...KeyType) *MapType {
 	for _, key := range keys {
 		n = n.Children[key]
 	}
 	return n
 }
 
-func (n *Node) Set(v ValueType, keys ...KeyType) {
+func (n *MapType) Set(v ValueType, keys ...KeyType) {
 	n = n.Get(keys...)
 	n.Value = v
 }
