@@ -6,7 +6,7 @@ import (
 )
 
 func BuildMap(client *api.Client, prefix string) (*MapType, error) {
-	kvMap := &MapType{Value: "root"}
+	kvMap := &MapType{Value: ""}
 
 	kvPairs, _, err := client.KV().List(prefix, nil)
 	if err != nil {
