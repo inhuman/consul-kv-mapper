@@ -6,7 +6,7 @@ import (
 )
 
 func BuildMap(client *api.Client, prefix string) (interface{}, error) {
-	var kvMap interface{}
+	kvMap := &Node{Value: "root"}
 
 	kvPairs, _, err := client.KV().List(prefix, nil)
 	if err != nil {
@@ -14,8 +14,6 @@ func BuildMap(client *api.Client, prefix string) (interface{}, error) {
 	}
 
 	if len(kvPairs) != 0 {
-
-		root := &Node{Value: "root"}
 
 		for _, pair := range kvPairs {
 
@@ -31,7 +29,7 @@ func BuildMap(client *api.Client, prefix string) (interface{}, error) {
 
 			for i := 0; i < len(parts); i++ {
 				if len(parts) > i {
-					if (root.Get(parts[:(i+1)]...) == nil) && (parts[i] != "") {
+					if (kvMap.Get(parts[:(i+1)]...) == nil) && (parts[i] != "") {
 						var val ValueType
 						val = ValueType("")
 
@@ -39,7 +37,7 @@ func BuildMap(client *api.Client, prefix string) (interface{}, error) {
 							val = ValueType(pair.Value)
 						}
 
-						addNextLevel(root, parts[i], val, parts[:i]...)
+						addNextLevel(kvMap, parts[i], val, parts[:i]...)
 					}
 				}
 			}
